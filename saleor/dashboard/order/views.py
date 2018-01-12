@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.utils.translation import pgettext_lazy
-from django_prices.templatetags.prices_i18n import gross
 from payments import PaymentStatus
 from prices import Price
 from satchless.item import InsufficientStock
@@ -26,6 +25,10 @@ from ...core.utils import get_paginator_items
 from ...order import GroupStatus
 from ...order.models import Order, OrderLine, OrderNote
 from ...userprofile.i18n import AddressForm
+
+
+# FIXME: remove stopgap function
+from saleor.prices_stopgap import gross
 
 
 @staff_member_required
