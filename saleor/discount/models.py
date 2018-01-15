@@ -8,14 +8,11 @@ from django.utils.encoding import smart_text
 from django.utils.translation import pgettext, pgettext_lazy
 from django_countries import countries
 from django_prices.models import AmountField
+from django_prices.templatetags.prices_i18n import amount
 from prices import FixedDiscount, Price, percentage_discount
 
 from ..cart.utils import (
     get_category_variants_and_prices, get_product_variants_and_prices)
-
-
-# FIXME: remove stopgap function
-from saleor.prices_stopgap import net
 
 
 class NotApplicable(ValueError):
@@ -175,7 +172,7 @@ class Voucher(models.Model):
             msg = pgettext(
                 'Voucher not applicable',
                 'This offer is only valid for orders over %(amount)s.')
-            raise NotApplicable(msg % {'amount': net(limit)}, limit=limit)
+            raise NotApplicable(msg % {'amount': amount(limit)}, limit=limit)
 
     def get_discount_for_checkout(self, checkout):
         if self.type == Voucher.VALUE_TYPE:
