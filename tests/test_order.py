@@ -1,6 +1,9 @@
+from django.test.client import RequestFactory
+from django.urls import reverse
 from prices import Price
 
 from saleor.order import models, OrderStatus
+from saleor.order.forms import OrderNoteForm
 from saleor.order.utils import add_variant_to_delivery_group
 
 
@@ -101,3 +104,12 @@ def test_order_queryset_closed_orders(open_orders, closed_orders):
     qs = models.Order.objects.closed()
     assert qs.count() == len(closed_orders)
     assert all([item in qs for item in closed_orders])
+
+
+def test_add_order_to_note(order_with_lines_and_stock):
+    order = order_with_lines_and_stock
+    note = models.OrderNote(order=order, user=order.user)
+    note_form = OrderNoteForm({'content': 'test_note'}, instance=note)
+    note_form.is_valid()
+    note_form.save()
+    assert order.notes.first().content == 'test_note'
