@@ -90,7 +90,7 @@ def order_add_note(request, order_pk):
         msg = pgettext_lazy(
             'Dashboard message related to an order',
             'Added note')
-        order.create_history_entry(comment=msg, user=request.user)
+        order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
     elif form.errors:
         status = 400
@@ -113,7 +113,7 @@ def capture_payment(request, order_pk, payment_pk):
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
             'Captured %(amount)s') % {'amount': gross(amount)}
-        payment.order.create_history_entry(comment=msg, user=request.user)
+        payment.order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200
@@ -136,7 +136,7 @@ def refund_payment(request, order_pk, payment_pk):
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
             'Refunded %(amount)s') % {'amount': gross(amount)}
-        payment.order.create_history_entry(comment=msg, user=request.user)
+        payment.order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200
@@ -154,7 +154,7 @@ def release_payment(request, order_pk, payment_pk):
     form = ReleasePaymentForm(request.POST or None, payment=payment)
     if form.is_valid() and form.release():
         msg = pgettext_lazy('Dashboard message', 'Released payment')
-        payment.order.create_history_entry(comment=msg, user=request.user)
+        payment.order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200
@@ -181,7 +181,7 @@ def orderline_change_quantity(request, order_pk, line_pk):
                 'product': line.product, 'old_quantity': old_quantity,
                 'new_quantity': line.quantity}
         with transaction.atomic():
-            order.create_history_entry(comment=msg, user=request.user)
+            order.create_history_entry(content=msg, user=request.user)
             form.save()
             messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
@@ -218,7 +218,7 @@ def orderline_split(request, order_pk, line_pk):
             ' to %(new_group)s') % {
                 'how_many': how_many, 'item': line, 'old_group': old_group,
                 'new_group': target_group}
-        order.create_history_entry(comment=msg, user=request.user)
+        order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     elif form.errors:
@@ -241,7 +241,7 @@ def orderline_cancel(request, order_pk, line_pk):
             'Dashboard message related to an order line',
             'Cancelled item %s') % line
         with transaction.atomic():
-            order.create_history_entry(comment=msg, user=request.user)
+            order.create_history_entry(content=msg, user=request.user)
             form.cancel_line()
             messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
@@ -268,7 +268,7 @@ def ship_delivery_group(request, order_pk, group_pk):
             'Dashboard message related to a shipment group',
             'Shipped %s') % group
         messages.success(request, msg)
-        group.order.create_history_entry(comment=msg, user=request.user)
+        group.order.create_history_entry(content=msg, user=request.user)
         return redirect('dashboard:order-details', order_pk=order_pk)
     elif form.errors:
         status = 400
@@ -291,7 +291,7 @@ def cancel_delivery_group(request, order_pk, group_pk):
             'Dashboard message related to a shipment group',
             'Cancelled %s') % group
         messages.success(request, msg)
-        group.order.create_history_entry(comment=msg, user=request.user)
+        group.order.create_history_entry(content=msg, user=request.user)
         return redirect('dashboard:order-details', order_pk=order_pk)
     elif form.errors:
         status = 400
@@ -321,7 +321,7 @@ def add_variant_to_group(request, order_pk, group_pk):
             msg = pgettext_lazy(
                 'Dashboard message related to a shipment group',
                 'Added %(quantity)d x %(variant)s to %(group)s') % msg_dict
-            order.create_history_entry(comment=msg, user=request.user)
+            order.create_history_entry(content=msg, user=request.user)
             messages.success(request, msg)
         except InsufficientStock:
             msg = pgettext_lazy(
@@ -354,7 +354,7 @@ def address_view(request, order_pk, address_type):
     form = AddressForm(request.POST or None, instance=address)
     if form.is_valid():
         form.save()
-        order.create_history_entry(comment=success_msg, user=request.user)
+        order.create_history_entry(content=success_msg, user=request.user)
         messages.success(request, success_msg)
         return redirect('dashboard:order-details', order_pk=order_pk)
     ctx = {'order': order, 'address_type': address_type, 'form': form}
@@ -371,7 +371,7 @@ def cancel_order(request, order_pk):
         msg = pgettext_lazy('Dashboard message', 'Cancelled order')
         with transaction.atomic():
             form.cancel_order()
-            order.create_history_entry(comment=msg, user=request.user)
+            order.create_history_entry(content=msg, user=request.user)
         messages.success(request, 'Order cancelled')
         return redirect('dashboard:order-details', order_pk=order.pk)
         # TODO: send status confirmation email
@@ -392,7 +392,7 @@ def remove_order_voucher(request, order_pk):
         msg = pgettext_lazy('Dashboard message', 'Removed voucher from order')
         with transaction.atomic():
             form.remove_voucher()
-            order.create_history_entry(comment=msg, user=request.user)
+            order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     elif form.errors:
